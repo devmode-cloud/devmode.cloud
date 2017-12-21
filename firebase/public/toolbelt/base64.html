@@ -1,0 +1,99 @@
+<!doctype html>
+
+<title>base64 tool</title>
+<h1>👨‍💻 base64 encode/decode tool</h1>
+
+<form id="decode">
+  <textarea class="left" name="encoded" placeholder="base64 encoded"></textarea>
+  <button type="submit">Decode!</button>
+  <textarea class="right" name="decoded" placeholder="decoded"></textarea>
+  <textarea class="right" name="bytes" placeholder="hex bytes"></textarea>
+</form>
+
+<form id="encode">
+  <textarea class="left" name="decoded" placeholder="plain text"></textarea>
+  <button type="submit">Encode!</button>
+  <textarea class="right" name="encoded" placeholder="encoded"></textarea>
+  <textarea class="right" name="bytes" placeholder="hex bytes"></textarea>
+</form>
+
+<script type="text/javascript">
+  function rawToBytes(raw) {
+    const bytes = [];
+    for (var i = 0; i < raw.length; i++) {
+      bytes.push(raw.codePointAt(i));
+    }
+    return bytes.map(x => x.toString(16)).join(' ');
+  }
+
+  document.querySelector('#decode').addEventListener('submit', evt => {
+    evt.preventDefault();
+    try {
+      const encoded = evt.target.encoded.value;
+      const decoded = atob(encoded);
+      evt.target.decoded.value = decoded;
+      evt.target.bytes.value = rawToBytes(decoded);
+    } catch (err) {
+      alert(err);
+    }
+  });
+
+  document.querySelector('#encode').addEventListener('submit', evt => {
+    try {
+      evt.preventDefault();
+      const decoded = evt.target.decoded.value;
+      const encoded = btoa(decoded);
+      evt.target.encoded.value = encoded;
+      evt.target.bytes.value = rawToBytes(decoded);
+    } catch (err) {
+      alert(err);
+    }
+  });
+</script>
+
+<style type="text/css">
+  body {
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 2em;
+    box-sizing: border-box;
+    min-width: 40em;
+    font-family: monospace;
+  }
+  h1 {
+    margin: 0.3em 1em;
+    color: #999;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 8em 1fr;
+    grid-gap: 1em;
+    grid-auto-rows: minmax(3em, auto);
+
+    margin: 1em;
+    flex: 1;
+  }
+  textarea {
+    background-color: #111;
+    color: #fff;
+    padding: 0.2em 0.5em;
+  }
+  textarea.left {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+  textarea.right {
+    grid-column: 3;
+  }
+  button {
+    grid-column: 2;
+    grid-row: span 2;
+    background-color: #555;
+    font-family: inherit;
+    color: #fff;
+  }
+</style>
