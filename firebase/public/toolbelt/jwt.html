@@ -1,0 +1,86 @@
+<!doctype html>
+
+<title>jwt tool</title>
+<h1>👨‍💻 jwt inspector tool</h1>
+
+<form id="decode">
+  <textarea class="left" name="token" placeholder="jwt body"></textarea>
+  <button type="submit">Inspect!</button>
+  <textarea class="right" name="header" placeholder="header data"></textarea>
+  <textarea class="right" name="body" placeholder="body data"></textarea>
+</form>
+
+<script type="text/javascript">
+  const jwtBox = document.querySelector('[name=token]');
+  jwtBox.focus();
+  jwtBox.addEventListener('paste', evt => {
+    try {
+      evt.target.value = evt.clipboardData.getData('text');
+      const jwt = evt.target.value;
+
+      const parts = jwt.split('.');
+      if (parts.length != 3) {
+        alert('thats no jwt!');
+        return;
+      }
+
+      const header = JSON.parse(atob(parts[0]));
+      const body = JSON.parse(atob(parts[1]));
+      console.log(header, body);
+      //evt.target.decoded.value = decoded;
+
+      document.querySelector('[name=header]').value = JSON.stringify(header, null, 2);
+      document.querySelector('[name=body]').value = JSON.stringify(body, null, 2);
+
+    } catch (err) {
+      alert(err);
+    }
+  });
+</script>
+
+<style type="text/css">
+  body {
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 2em;
+    box-sizing: border-box;
+    min-width: 40em;
+    font-family: monospace;
+  }
+  h1 {
+    margin: 0.3em 1em;
+    color: #999;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 8em 1fr;
+    grid-gap: 1em;
+    grid-template-rows: 8em 1fr;
+
+    margin: 1em;
+    flex: 1;
+  }
+  textarea {
+    background-color: #111;
+    color: #fff;
+    padding: 0.2em 0.5em;
+  }
+  textarea.left {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+  textarea.right {
+    grid-column: 3;
+  }
+  button {
+    grid-column: 2;
+    grid-row: span 2;
+    background-color: #555;
+    font-family: inherit;
+    color: #fff;
+  }
+</style>
