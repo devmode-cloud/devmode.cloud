@@ -12,13 +12,27 @@
 <script type="text/javascript">
   const inputBox = document.querySelector('[name=input]');
   const outputBox = document.querySelector('[name=output]');
+  const form = document.querySelector('form');
+
+  function prettify(raw) {
+    const input = JSON.parse(raw);
+    outputBox.value = JSON.stringify(input, null, 2);
+  }
+
+  form.addEventListener('submit', evt => {
+    evt.preventDefault();
+    try {
+      prettify(inputBox.value);
+    } catch (err) {
+      alert(err);
+    }
+  });
+
   inputBox.focus();
   inputBox.addEventListener('paste', evt => {
     try {
-      evt.target.value = evt.clipboardData.getData('text');
-      const input = JSON.parse(evt.target.value);
-      outputBox.value = JSON.stringify(input, null, 2);
-
+      inputBox.value = '';
+      prettify(evt.clipboardData.getData('text'));
     } catch (err) {
       alert(err);
     }
