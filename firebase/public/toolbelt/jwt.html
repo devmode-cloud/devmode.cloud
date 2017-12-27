@@ -12,30 +12,43 @@
 
 <script type="text/javascript">
   const jwtBox = document.querySelector('[name=token]');
-  jwtBox.focus();
-  jwtBox.addEventListener('paste', evt => {
+  const form = document.querySelector('form');
+
+  function decodeJWT(jwt) {
+    const parts = jwt.split('.');
+    if (parts.length != 3) {
+      alert('thats no jwt!');
+      return;
+    }
+
+    const header = JSON.parse(atob(parts[0]));
+    const body = JSON.parse(atob(parts[1]));
+    console.log(header, body);
+    //evt.target.decoded.value = decoded;
+
+    document.querySelector('[name=header]').value = JSON.stringify(header, null, 2);
+    document.querySelector('[name=body]').value = JSON.stringify(body, null, 2);
+  }
+
+  form.addEventListener('submit', evt => {
+    evt.preventDefault();
     try {
-      evt.target.value = evt.clipboardData.getData('text');
-      const jwt = evt.target.value;
-
-      const parts = jwt.split('.');
-      if (parts.length != 3) {
-        alert('thats no jwt!');
-        return;
-      }
-
-      const header = JSON.parse(atob(parts[0]));
-      const body = JSON.parse(atob(parts[1]));
-      console.log(header, body);
-      //evt.target.decoded.value = decoded;
-
-      document.querySelector('[name=header]').value = JSON.stringify(header, null, 2);
-      document.querySelector('[name=body]').value = JSON.stringify(body, null, 2);
-
+      decodeJWT(jwtBox.value);
     } catch (err) {
       alert(err);
     }
   });
+
+  jwtBox.focus();
+  jwtBox.addEventListener('paste', evt => {
+    try {
+      jwtBox.value = '';
+      decodeJWT(evt.clipboardData.getData('text'));
+    } catch (err) {
+      alert(err);
+    }
+  });
+
 </script>
 
 <style type="text/css">
