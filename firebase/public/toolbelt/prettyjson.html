@@ -15,7 +15,16 @@
   const form = document.querySelector('form');
 
   function prettify(raw) {
-    const input = JSON.parse(raw);
+    var input = JSON.parse(raw);
+
+    // if user pasted JSON-encoded string, try parsing it as an object
+    // useful feature when extracting JSON from a parent JSON document
+    if (input.constructor === String) {
+      // TODO: nicer messaging
+      alert("Automatically parsing contents of JSON string as JSON");
+      input = JSON.parse(input);
+    }
+
     outputBox.value = JSON.stringify(input, null, 2);
   }
 
