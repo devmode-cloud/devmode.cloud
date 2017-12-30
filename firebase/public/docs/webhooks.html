@@ -1,0 +1,112 @@
+<!doctype html>
+<title>webhooks @ devmode.cloud</title>
+
+<section>
+  <h1>webhooks <span class="gray">@</span> devmode.cloud</h1>
+  <p>We speak webhook on <strong>Freenode</strong>! Chuck payloads at our endpoints and colorful IRC messages will appear in your channel :)</p>
+  <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. By adding these webhooks to your project, you agree to these terms.</p>
+  <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a>.</p>
+</section>
+
+<section>
+  <h2>github</h2>
+  <p>Add this URL under Settings -> Webhooks:</p>
+  <p><code>https://ingest.devmode.cloud/hooks/github?channel=#yourchannel</code></p>
+  <p>You should immediately see a confirmation in your channel. This hook is faster, less noisy, and richer than GitHub's own IRC integration. Send just <code>push</code> events, or opt into get more activity into your channel. Supports both form-encoded and plain JSON payloads.</p>
+  <p>Implemented event types:</p>
+  <ul>
+    <li><code>push</code> for push, force push/revert, and branch creation/deletion</li>
+    <li><code>issues</code> for opening, editting, and [un]labeling issues</li>
+    <li><code>watch</code> for repository watches/unwatches</li>
+    <li><code>ping</code> to notify of new hooks being configured</li>
+  </ul>
+  <p>The current version of this hook is maintained in <a href="https://gist.github.com/danopia/5bf79f4eb6f31857c1c95a96f313665b">a public gist</a>.</p>
+  <p>If you have more events to handle, let me know: <code>#stardust</code> on freenode</p>
+
+  <div class="examples">
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> pushed to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">156849d</span><span> </span><span style="color: rgb(210, 210, 210);">GitHub</span><span>: Improve github issues; add github watch </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/PC2st" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/PC2st</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> </span><span style="color: rgb(255, 0, 0);">force-pushed</span><span> to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">3da5936</span><span>: fix multi-starnotify k8s config </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/B3P7i" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/B3P7i</span></a></span></div>
+    <div class="message"><span>[</span><span style="color: rgb(255, 0, 255);">app-suite</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> opened issue </span><span style="font-weight: bold;">#2</span><span>: Host Shell </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/4qVb" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/4qVb</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">app-suite</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> labeled </span><span style="color: rgb(156, 0, 156);">launch checklist</span><span> on issue </span><span style="font-weight: bold;">#2</span><span>: Host Shell </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/4qVb" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/4qVb</span></a></span></div>
+  </div>
+</section>
+
+<section>
+  <h2>travis-ci</h2>
+  <p>Add this URL to your configuration YAML:</p>
+  <p><code>https://ingest.devmode.cloud/hooks/travisci?channel=%23yourchannel</code></p>
+  <p>Announces build results with commit hash, outcome, branch, and build URL.</p>
+  <p>Double-check that you <strong>do not</strong> use a <code>#</code> symbol in the URL. You <strong>must</strong> write <code>%23</code> instead.</p>
+
+  <div class="examples">
+    <div class="message "><span>[</span><span style="color: rgb(210, 210, 210);">relrod</span><span>/</span><span style="color: rgb(255, 0, 255);">telepush</span><span>] </span><span style="color: rgb(127, 127, 127);">338c02d</span><span> Build </span><span style="font-weight: bold;">#10</span><span> </span><span style="color: rgb(0, 147, 0);">Passed</span><span> on </span><span style="color: rgb(156, 0, 156);">master</span><span> </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/zqvk" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/zqvk</span></a></span></div>
+  </div>
+</section>
+
+<section>
+  <h2>more services <span class="gray">/</span> other networks</h2>
+  <p>I'm open to integrating additional service integrations. I'll expect to accept some initial payloads to build a rough integration around, and then flesh it out as more paylods roll in.</p>
+  <p>Join up, let's talk: <code>#stardust</code> on freenode</p>
+  <p>I expect to stick to Freenode for the immediate future. I'll be able to add more networks down the road.</p>
+</section>
+
+<style type="text/css">
+  body {
+    font-family: sans-serif;
+    background-color: #99c;
+    color: #000;
+  }
+  section {
+    font-size: 1.2em;
+    max-width: 35em;
+    margin: 2em auto;
+    background-color: #eef;
+    padding: 0.2em 1em;
+    box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14),
+                0 1px 18px 0 rgba(0,0,0,0.12),
+                0 3px 5px -1px rgba(0,0,0,0.3);
+  }
+  h1, h2 {
+    text-align: center;
+  }
+  a:not(:hover) {
+    text-decoration: none;
+  }
+  code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 0.1em 0.3em;
+    border-radius: 0.3em;
+  }
+  .gray {
+    color: rgba(0, 0, 0, 0.3);
+  }
+  .examples {
+    background-color: #333;
+    padding: 0.5em;
+    margin-bottom: 1em;
+    color: #fff;
+    font-size: 0.8em;
+    font-family: monospace;
+  }
+</style>
+
+<script type="text/javascript">
+  document.querySelectorAll('code').forEach(code => {
+    code.addEventListener('click', evt => {
+      console.log('code tag was clicked, selecting');
+
+      if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(evt.target);
+        range.select();
+      } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(evt.target);
+
+        const selection = window.getSelection();
+        selection.empty();
+        selection.addRange(range);
+      }
+    });
+  });
+</script>
