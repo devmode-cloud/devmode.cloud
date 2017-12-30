@@ -1,17 +1,17 @@
 <!doctype html>
 <title>webhooks @ devmode.cloud</title>
 
-<section>
-  <h1>webhooks <span class="gray">@</span> devmode.cloud</h1>
+<a name="overview"></a><section>
+  <h1><a href="#overview">webhooks <span class="gray">@</span> devmode.cloud</a></h1>
   <p>We speak webhook on <strong>Freenode</strong>! Chuck payloads at our endpoints and colorful IRC messages will appear in your channel from <code>skylink</code> :)</p>
   <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. By adding these webhooks to your project, you agree to these terms.</p>
   <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a>.</p>
 </section>
 
-<section>
-  <h2>github</h2>
+<a name="hook-github"></a><section>
+  <h2><a href="#hook-github"><span class="gray">hook:</span> github</a></h2>
   <p>Add this URL under Settings -> Webhooks:</p>
-  <p><code>https://ingest.devmode.cloud/hooks/github?channel=#yourchannel</code></p>
+  <code>https://ingest.devmode.cloud/hooks/github?channel=#yourchannel</code>
   <p>You should immediately see a confirmation in your channel. This hook is faster, less noisy, and richer than GitHub's own IRC integration. Send just <code>push</code> events, or opt into get more activity into your channel. Supports both form-encoded and plain JSON payloads.</p>
   <p>Implemented event types:</p>
   <ul>
@@ -22,10 +22,10 @@
     <li><code>watch</code> for repository watches/unwatches</li>
     <li><code>ping</code> to notify of new hooks being configured</li>
   </ul>
-  <p>The current version of this hook is maintained in <a href="https://gist.github.com/danopia/5bf79f4eb6f31857c1c95a96f313665b">a public gist</a>.</p>
-  <p>If you have more events to handle, let me know: <code>#stardust</code> on freenode</p>
 
+  <p>Examples of different event types:</p>
   <div class="examples">
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">aws-plumbing</span><span>] This GitHub hook is working! Received a </span><span style=""><code>ping</code></span><span> event. Mind your words, they are important. </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/CfzaH" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/CfzaH</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> pushed to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">156849d</span><span> </span><span style="color: rgb(210, 210, 210);">GitHub</span><span>: Improve github issues; add github watch </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/PC2st" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/PC2st</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> </span><span style="color: rgb(255, 0, 0);">force-pushed</span><span> to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">3da5936</span><span>: fix multi-starnotify k8s config </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/B3P7i" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/B3P7i</span></a></span></div>
     <div class="message"><span>[</span><span style="color: rgb(255, 0, 255);">app-suite</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> opened issue </span><span style="font-weight: bold;">#2</span><span>: Host Shell </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/4qVb" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/4qVb</span></a></span></div>
@@ -34,30 +34,37 @@
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(210, 210, 210);">simonmichael</span><span> closed issue </span><span style="font-weight: bold;">#683</span><span>: Odd behaviour when using prices </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/6nbC" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/6nbC</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(127, 127, 127);">8f55b61</span><span> build </span><span style="color: rgb(210, 210, 210);">success</span><span>: The Travis CI build passed </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/2OwaD" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/2OwaD</span></a></span></div>
   </div>
+
+  <p>Pushing multiple commits at once can produce up to 4 messages:</p>
   <div class="examples">
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(210, 210, 210);">simonmichael</span><span> created </span><span style="color: rgb(156, 0, 156);">value-cleanup</span><span> with </span><span style="font-weight: bold;">2</span><span> new commits: </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/RhC3" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/RhC3</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>/</span><span style="color: rgb(156, 0, 156);">value-cleanup</span><span>] </span><span style="color: rgb(127, 127, 127);">0a9d724</span><span>: lib: clarify journalApplyValue comment</span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>/</span><span style="color: rgb(156, 0, 156);">value-cleanup</span><span>] </span><span style="color: rgb(127, 127, 127);">69e255c</span><span>: lib: deduplicate, refactor valuation code</span></div>
   </div>
+
+  <p>The current version of this hook is maintained in <a href="https://gist.github.com/danopia/5bf79f4eb6f31857c1c95a96f313665b">a public gist</a>.</p>
+  <p>If you have more events to handle, let me know: <code>#stardust</code> on freenode</p>
 </section>
 
-<section>
-  <h2>travis-ci</h2>
+<a name="hook-travisci"></a><section>
+  <h2><a href="#hook-travisci"><span class="gray">hook:</span> travis-ci</a></h2>
   <p>Add this URL to your configuration YAML:</p>
-  <p><code>https://ingest.devmode.cloud/hooks/travisci?channel=%23yourchannel</code></p>
-  <p>Announces build results with commit hash, outcome, branch, and build URL.</p>
-  <p>Double-check that you <strong>do not</strong> use a <code>#</code> symbol in the URL. You <strong>must</strong> write <code>%23</code> instead.</p>
+  <code>https://ingest.devmode.cloud/hooks/travisci?channel=%23yourchannel</code>
 
+  <p>Announces build results with commit hash, outcome, branch, and build URL:</p>
   <div class="examples">
     <div class="message "><span>[</span><span style="color: rgb(210, 210, 210);">relrod</span><span>/</span><span style="color: rgb(255, 0, 255);">telepush</span><span>] </span><span style="color: rgb(127, 127, 127);">338c02d</span><span> Build </span><span style="font-weight: bold;">#10</span><span> </span><span style="color: rgb(0, 147, 0);">Passed</span><span> on </span><span style="color: rgb(156, 0, 156);">master</span><span> </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/zqvk" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/zqvk</span></a></span></div>
   </div>
+
+  <p>Double-check that you <strong>do not</strong> use a <code>#</code> symbol in the channel name. You <strong>must</strong> type <code>%23</code> instead, otherwise Travis doesn't include the channel parameter.</p>
 </section>
 
-<section>
-  <h2>more services <span class="gray">/</span> other networks</h2>
+<a name="the-future"></a><section>
+  <h2><a href="#the-future">more services <span class="gray">/ the</span> future</a></h2>
   <p>I'm open to integrating additional service integrations. I'll expect to accept several initial payloads to build a rough integration around, and then flesh it out as more payloads roll in.</p>
   <p>Join up, let's talk: <code>#stardust</code> on freenode</p>
   <p>I expect to stick to Freenode for the immediate future. I'll be able to add more networks down the road.</p>
+  <p><em>psst:</em> These hooks are a part of an upcoming platform that will offer strong service integrations with web-based configuration. <a href="https://devmode.cloud" target="_blank">learn more...</a></p>
 </section>
 
 <style type="text/css">
@@ -65,27 +72,48 @@
     font-family: sans-serif;
     background-color: #99c;
     color: #000;
+    padding-bottom: 10em;
   }
   section {
     font-size: 1.2em;
     max-width: 35em;
-    margin: 2em auto;
+    margin: 0 auto;
     background-color: #eef;
-    padding: 0.2em 1em;
+    padding: 1em 1em;
     box-shadow: 0 6px 10px 0 rgba(0,0,0,0.14),
                 0 1px 18px 0 rgba(0,0,0,0.12),
                 0 3px 5px -1px rgba(0,0,0,0.3);
   }
   h1, h2 {
     text-align: center;
+    margin: 0 0 0.5em;
+  }
+  h1 a, h2 a {
+    color: inherit;
+  }
+  p, ul {
+    margin: 0.2em 0;
+  }
+  p + p, div + p, code + p, ul + p {
+    margin-top: 1em;
   }
   a:not(:hover) {
     text-decoration: none;
   }
+  /* anchor high enough to indicate previous content */
+  a[name] {
+    display: block;
+    margin-top: -0.5em;
+    padding-bottom: 2.5em;
+  }
   code {
     background-color: rgba(0, 0, 0, 0.1);
-    padding: 0.1em 0.3em;
+    padding: 0.1em 0.5em;
     border-radius: 0.3em;
+    word-break: break-word;
+  }
+  code:hover {
+    background-color: rgba(0, 0, 0, 0.2);
   }
   .gray {
     color: rgba(0, 0, 0, 0.3);
