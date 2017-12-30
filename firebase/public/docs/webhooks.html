@@ -4,7 +4,7 @@
 <a name="overview"></a><section>
   <h1><a href="#overview">webhooks <span class="gray">@</span> devmode.cloud</a></h1>
   <p>We speak webhook on <strong>Freenode</strong>! Chuck payloads at our endpoints and colorful IRC messages will appear in your channel from <code>skylink</code> :)</p>
-  <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. By adding these webhooks to your project, you agree to these terms.</p>
+  <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. <u>By adding these webhooks to your project, you agree to these terms.</u></p>
   <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a>.</p>
 </section>
 
@@ -16,11 +16,19 @@
   <p>Implemented event types:</p>
   <ul>
     <li><code>push</code> for push, force push/revert, merge, and branch creation/deletion</li>
-    <li><code>issues</code> for opening, editting, and [un]labeling issues</li>
-    <li><code>issue_comment</code> to paste in new comments</li>
+    <li><code>issues</code> for opening, editting, closing, [de]milestoning, and [un]labeling issues</li>
+    <li><code>issue_comment</code> to notify of new comments, including body, and also mention edits</li>
+    <li><code>pull_request</code> is a lot like <code>issues</code> plus synchronization</li>
     <li><code>status</code> for non-pending build statuses</li>
+    <li><code>milestone</code> and <code>label</code> to report on planning updates</li>
     <li><code>watch</code> for repository watches/unwatches</li>
     <li><code>ping</code> to notify of new hooks being configured</li>
+  </ul>
+
+  <p>The hook URL supports extra parameters on the end:</p>
+  <ul>
+    <li><code>&amp;longurl</code> disables the URL shortener. Doesn't matter what value you pass.</li>
+    <li><code>&amp;branch_filter=master,develop</code> drops push events for branches not in the list. Do not pass this option more than once, you must use commas to list multiple branches.</li>
   </ul>
 
   <p>Examples of different event types:</p>
