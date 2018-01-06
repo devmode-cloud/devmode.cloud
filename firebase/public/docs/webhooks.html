@@ -34,20 +34,34 @@
 
   <p>The hook URL supports extra parameters on the end. Passing a single option more than once is not supported, you must use commas for lists.</p>
   <ul>
-    <li><code>&amp;longurl</code> disables the URL shortener. Doesn't matter what value you pass.</li>
-    <li><code>&amp;branch_filter=master,develop</code> <em>only</em> shows push events for branches matching the pattern list.</li>
-    <li><code>&amp;branch_ignore=staging.*,trying.*</code> <em>drops</em> push events for branches matching the pattern list.</li>
-    <li><code>&amp;bors=bors[bot]</code> sets a <a href="https://bors.tech/" target="_blank">bors</a> name for extra handling. Use this with <code>branch_ignore</code> for best results!</li>
-    <li><code>&amp;verbosity=3</code> adjusts notification volume from 1 to 4: 1=Minimal, 2=Default, 3=Extra, 4=Everything. If you'd like more details, try level 3. Level 4 doesn't even drop duplicated events.</li>
+    <li><code>&amp;<span>longurl</span></code> disables the URL shortener. Doesn't matter what value you pass.</li>
+    <li><code>&amp;<span>branch_filter</span>=master,develop</code> <em>only</em> shows push events for branches matching the pattern list.</li>
+    <li><code>&amp;<span>branch_ignore</span>=staging.*,trying.*</code> <em>drops</em> push events for branches matching the pattern list.</li>
+    <li><code>&amp;<span>bors</span>=bors[bot]</code> sets a <a href="https://bors.tech/" target="_blank">bors</a> name for extra handling.<ul>
+      <li>Use this with <code>branch_ignore</code> for best results!</li>
+    </ul></li>
+    <li><code>&amp;<span>verbosity</span>=3</code> adjusts notification volume from 1 to 4, default 2.<ul>
+      <li>1=Minimal, 2=Default, 3=Extra, 4=Everything.</li>
+      <li>If you'd like more details, try level 3. Level 4 doesn't even drop duplicated events.</li>
+    </ul>
   </ul>
 
   <p>Examples of different event types:</p>
   <div class="examples">
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">awooos</span><span>] </span><span style="color: rgb(210, 210, 210);">duckinator</span><span> opened new PR </span><span style="font-weight: bold;">#25</span><span> with 2 commits from </span><span style="color: rgb(156, 0, 156);">duckinator:test-panic</span><span>: Test kernel panics. </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/KyU3" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/KyU3</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">awooos</span><span>] </span><span style="color: rgb(210, 210, 210);">duckinator</span><span> pushed to </span><span style="color: rgb(156, 0, 156);">test-panic</span><span>: </span><span style="color: rgb(127, 127, 127);">735a3f4</span><span>: make kernel panic test less intrusive. </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/VE6Y" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/VE6Y</span></a></span></div>
+<div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">awooos</span><span>] </span><span style="color: rgb(210, 210, 210);">duckinator</span><span> commented on issue </span><span style="font-weight: bold;">#25</span><span>: bors r+ </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/q3m7" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/q3m7</span></a></span></div>
+<div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">awooos</span><span>] </span><span style="color: rgb(210, 210, 210);">bors[bot]</span><span> closed and merged PR </span><span style="font-weight: bold;">#25</span><span> into </span><span style="color: rgb(156, 0, 156);">master</span><span>: Test kernel panics. </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/KyU3" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/KyU3</span></a></span></div>
+<div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">awooos</span><span>] </span><span style="color: rgb(210, 210, 210);">bors[bot]</span><span> merged 6 commits from </span><span style="color: rgb(156, 0, 156);">staging</span><span> into </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/qmqD" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/qmqD</span></a></span></div>
+
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">aws-plumbing</span><span>] This GitHub hook is working! Received a </span><span style=""><code>ping</code></span><span> event. Mind your words, they are important. </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/CfzaH" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/CfzaH</span></a></span></div>
+
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> pushed to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">156849d</span><span> </span><span style="color: rgb(210, 210, 210);">GitHub</span><span>: Improve github issues; add github watch </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/PC2st" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/PC2st</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">home-lab</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> </span><span style="color: rgb(255, 0, 0);">force-pushed</span><span> to </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(127, 127, 127);">3da5936</span><span>: fix multi-starnotify k8s config </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/B3P7i" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/B3P7i</span></a></span></div>
+
     <div class="message"><span>[</span><span style="color: rgb(255, 0, 255);">app-suite</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> opened issue </span><span style="font-weight: bold;">#2</span><span>: Host Shell </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/4qVb" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/4qVb</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">app-suite</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> labeled </span><span style="color: rgb(156, 0, 156);">launch checklist</span><span> on issue </span><span style="font-weight: bold;">#2</span><span>: Host Shell </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/4qVb" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/4qVb</span></a></span></div>
+
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(210, 210, 210);">simonmichael</span><span> merged 4 commits from </span><span style="color: rgb(156, 0, 156);">value-cleanup</span><span> into </span><span style="color: rgb(156, 0, 156);">master</span><span>: </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/Huav" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/Huav</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(210, 210, 210);">simonmichael</span><span> closed issue </span><span style="font-weight: bold;">#683</span><span>: Odd behaviour when using prices </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/6nbC" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/6nbC</span></a></span></div>
     <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">hledger</span><span>] </span><span style="color: rgb(210, 210, 210);">azzamsa</span><span> starred the repository! ⭐</span></div>
@@ -72,7 +86,7 @@
 
   <p>Announces build results with commit hash, outcome, branch, and build URL:</p>
   <div class="examples">
-    <div class="message "><span>[</span><span style="color: rgb(210, 210, 210);">relrod</span><span>/</span><span style="color: rgb(255, 0, 255);">telepush</span><span>] </span><span style="color: rgb(127, 127, 127);">338c02d</span><span> Build </span><span style="font-weight: bold;">#10</span><span> </span><span style="color: rgb(0, 147, 0);">Passed</span><span> on </span><span style="color: rgb(156, 0, 156);">master</span><span> in 5.3 minutes: </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/zqvk" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/zqvk</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">telepush</span><span>] </span><span style="color: rgb(127, 127, 127);">338c02d</span><span> Build #10 </span><span style="color: rgb(0, 147, 0);">Passed</span><span> on </span><span style="color: rgb(156, 0, 156);">master</span><span> in 5.3 minutes: </span><span style="color: rgb(70, 130, 180);"><a href="https://da.gd/zqvk" target="_blank" class="content-link" style="color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/zqvk</span></a></span></div>
   </div>
 
   <p>Double-check that you <strong>do not</strong> use a <code>#</code> symbol in the channel name. You <strong>must</strong> type <code>%23</code> instead, otherwise Travis doesn't include the channel parameter.</p>
@@ -135,6 +149,9 @@
   code:hover {
     background-color: rgba(0, 0, 0, 0.2);
   }
+  code span {
+    font-weight: bold;
+  }
   .gray {
     color: rgba(0, 0, 0, 0.3);
   }
@@ -143,6 +160,8 @@
     color: #fff;
     font-size: 0.8em;
     font-family: monospace;
+    white-space: nowrap;
+    overflow-x: scroll;
 
     margin: 0 -1.6em;
     padding: 0.8em 1.6em;
