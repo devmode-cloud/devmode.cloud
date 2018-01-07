@@ -1,0 +1,245 @@
+<!doctype html>
+
+<title>timestamp tool</title>
+<h1>👨‍💻 timestamp conversion tool</h1>
+
+<style type="text/css">
+  body {
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 2em;
+    box-sizing: border-box;
+    min-width: 40em;
+  }
+  body, input, select {
+    font-family: monospace;
+  }
+  h1 {
+    margin: 0.3em 1em;
+    color: #999;
+  }
+  section {
+    font-size: 1.3em;
+    margin: 1em;
+    padding: 1em;
+    background-color: rgba(200, 200, 200, 0.3);
+    width: 40em;
+  }
+  input {
+    box-sizing: border-box;
+    background-color: #222;
+    color: #fff;
+    font-size: 1em;
+    padding: 0.3em 0.5em;
+    border: 1px solid #999;
+  }
+  input[readonly] {
+    border-width: 0;
+    background-color: #555;
+    font-family: inherit;
+    color: #fff;
+  }
+  select {
+    background-color: #222;
+    color: #fff;
+    font-size: 1em;
+    border: 1px solid #999;
+    padding: 0.3em 0.5em;
+  }
+
+  table {
+    width: 100%;
+  }
+  table th {
+    text-align: left;
+    font-weight: normal;
+  }
+  table input:not(.inline) {
+    width: 100%;
+  }
+  .addtl-info td {
+    padding-left: 0.9em;
+  }
+
+  #current-epoch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  input.epoch {
+    font-size: 1.3em;
+    text-align: center;
+  }
+  input.inline {
+    width: 4em;
+    text-align: center;
+  }
+
+  #output-format-select {
+    width: 100%;
+  }
+
+  .error-msg {
+    color: #f33;
+  }
+</style>
+
+<section id="current-epoch">
+  <label for="current-epoch-box">The current Epoch timestamp:</label>
+  <input class="epoch" id="current-epoch-box" type="text" readonly />
+  <label>seconds</label>
+</section>
+
+<section id="epoch-to-time">
+  <table class="formats">
+    <tr>
+      <td colspan="2"><input class="epoch" id="input-epoch-box" type="text" placeholder="1234567890" autofocus /></td>
+      <th><label for="input-epoch-box">Input Epoch timestamp</label></th>
+    </tr>
+    <tr>
+      <td>➡</td>
+      <td><select id="output-format-select">
+        <option value="LLL" selected>Friendly date/time</option>
+        <option value="l LTS">Numeric date/time</option>
+        <option value="YYYY-MM-DDTHH:mm:ssZ">ISO-8601</option>
+      </select></td>
+      <th><label for="output-format-select">Output format</label></th>
+    </tr>
+    <tr>
+      <td>↳</td>
+      <td><input id="epoch-to-time-local" type="text" readonly /></td>
+      <th><label for="epoch-to-time-local">Your browser time</label></th>
+    </tr>
+    <tr>
+      <td>↳</td>
+      <td><input id="epoch-to-time-utc" type="text" readonly /></td>
+      <th><label for="epoch-to-time-utc">UTC</label></th>
+    </tr>
+    <tr>
+      <td>↳</td>
+      <td><input id="epoch-to-time-tz" type="text" readonly /></td>
+      <th><select id="output-tz-select"></select></th>
+    </tr>
+    <tr class="addtl-info">
+      <td colspan="2"></td>
+      <td>Effective UTC offset: <input class="inline" id="epoch-to-time-tz-offset" type="text" readonly /> mins</td>
+    </tr>
+  </table>
+  <p id="epoch-to-time-error" class="error-msg"></p>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.14/moment-timezone-with-data.min.js"></script>
+<script type="text/javascript">
+
+  const currentEpoch = document.querySelector('#current-epoch input');
+  let isCurrentFocused = false;
+  updateCurrent = () => {
+    if (!isCurrentFocused) {
+      currentEpoch.value = Math.round(+new Date() / 1000);
+    }
+  };
+  setInterval(updateCurrent, 1000);
+  updateCurrent();
+
+  currentEpoch.addEventListener('focus', () => {
+    isCurrentFocused = true;
+    currentEpoch.setSelectionRange(0, -1);
+  });
+  currentEpoch.addEventListener('blur', () => {
+    isCurrentFocused = false;
+    updateCurrent();
+  });
+
+
+  const inputEpoch = document.querySelector('#input-epoch-box');
+  const outputFormatSelect = document.querySelector('#output-format-select');
+  const outputTimeLocal = document.querySelector('#epoch-to-time-local');
+  const outputTimeUtc = document.querySelector('#epoch-to-time-utc');
+  const outputTimeTz = document.querySelector('#epoch-to-time-tz');
+  const outputTimeTzOffset = document.querySelector('#epoch-to-time-tz-offset');
+  const outputTzSelect = document.querySelector('#output-tz-select');
+  const epochError = document.querySelector('#epoch-to-time-error');
+
+  const focusHandler = evt => evt.target.setSelectionRange(0, -1);
+  inputEpoch.addEventListener('focus', focusHandler);
+  outputTimeLocal.addEventListener('focus', focusHandler);
+  outputTimeUtc.addEventListener('focus', focusHandler);
+  outputTimeTz.addEventListener('focus', focusHandler);
+  outputTimeTzOffset.addEventListener('focus', focusHandler);
+
+  const parseEpoch = inputStr => {
+
+    // check for simple integers
+    if (inputStr.match(/^\d+$/)) {
+      const inputInt = parseInt(inputStr);
+
+      // go by number of digits
+      switch (inputStr.length) {
+        // seconds
+        case 10:
+          return inputInt * 1000;
+        // millis
+        case 13:
+          return inputInt;
+        // micros - JS will trim precision
+        case 16:
+          return inputInt / 1000;
+      }
+      throw new Error("Epoch timestamps with "+inputStr.length+" digits doesn't make sense");
+    }
+
+    if (inputStr.length) {
+      throw new Error("Epoch timestamp wasn't an integer, I don't understand");
+    }
+  };
+  const fromEpoch = () => {
+    try {
+      epochError.innerText = '';
+      const milliSeconds = parseEpoch(inputEpoch.value.trim());
+      if (milliSeconds) {
+        const format = outputFormatSelect.value;
+        outputTimeLocal.value = moment(milliSeconds).format(format);
+        outputTimeUtc.value = moment(milliSeconds).utc().format(format);
+
+        const tzMoment = moment(milliSeconds).tz(outputTzSelect.value);
+        outputTimeTz.value = tzMoment.format(format);
+        outputTimeTzOffset.value = tzMoment.utcOffset();
+      } else {
+        outputTimeLocal.value = '';
+        outputTimeUtc.value = '';
+        outputTimeTz.value = '';
+      }
+    } catch (err) {
+      epochError.innerText = err.message;
+    }
+  };
+  inputEpoch.addEventListener('input', fromEpoch);
+  inputEpoch.addEventListener('paste', evt => {
+    evt.target.value = '';
+  });
+
+  moment.tz.names().forEach(name => {
+    const opt = document.createElement('option');
+    opt.text = name;
+    opt.value = name;
+    outputTzSelect.add(opt);
+  });
+  outputTzSelect.value = moment.tz.guess();
+  outputTzSelect.addEventListener('input', fromEpoch);
+
+  outputFormatSelect.addEventListener('input', fromEpoch);
+
+  // if the browser didn't restore into the box, let's set a default
+  if (!inputEpoch.value) {
+    inputEpoch.value = Math.round(new Date()/1000);
+    fromEpoch();
+  }
+
+</script>
