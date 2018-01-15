@@ -5,7 +5,7 @@
   <h1><a href="#overview">webhooks <span class="gray">@</span> devmode.cloud</a></h1>
   <p>We speak webhook on <strong>Freenode</strong>! Chuck payloads at our endpoints and colorful IRC messages will appear in your channel from <code>skylink</code> :)</p>
   <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. <u>By adding these webhooks to your project, you agree to these terms.</u></p>
-  <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a> by default.</p>
+  <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a> by default. There's also a shortened version of these hooks based at https://sl.da.gd</p>
 
   <p>Available hooks:</p>
   <ul>
@@ -19,6 +19,8 @@
   <h2><a href="#hook-github"><span class="gray">hook:</span> github</a></h2>
   <p>Add this URL under Settings -> Webhooks:</p>
   <code>https://ingest.devmode.cloud/hooks/github?channel=#yourchannel</code>
+  <p>There's also a shorter version hosted on <a href="https://da.gd" target="_blank">a friend's server</a>, like so:</p>
+  <code>https://sl.da.gd/github?channel=#yourchannel</code>
   <p>You should immediately see a confirmation in your channel. This hook is faster, denser, and richer than GitHub's own IRC integration. Send just <code>push</code> events, or opt to get more activity into your channel.</p>
   <p>Implemented event types:</p>
   <ul>
@@ -81,8 +83,8 @@
 
 <a id="hook-travisci"></a><section>
   <h2><a href="#hook-travisci"><span class="gray">hook:</span> travis-ci</a></h2>
-  <p>Add this URL to your configuration YAML:</p>
-  <code>https://ingest.devmode.cloud/hooks/travisci?channel=%23yourchannel</code>
+  <p>Add this block to your configuration YAML:</p>
+  <code>notifications:<br>&nbsp;&nbsp;webhooks: https://ingest.devmode.cloud/hooks/travisci?channel=%23yourchannel</code>
 
   <p>Announces build results with commit hash, outcome, branch, and build URL:</p>
   <div class="examples">
