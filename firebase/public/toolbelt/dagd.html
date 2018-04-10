@@ -49,25 +49,38 @@
     padding: 0.2em 0.7em;
     margin-top: 0.3em;
     text-align: left;
+    flex: 1;
+  }
+  .multi-button {
+    display: flex;
+  }
+  .multi-button .alt-button {
+    flex: 0 1;
   }
 
-  #app {
-    display: flex;
-    flex: 1;
+  @media (min-width: 800px) {
+    #app {
+      display: flex;
+      flex: 1;
+    }
+    #action-col {
+      flex-basis: 30em;
+      overflow-y: auto;
+      padding: 2em 0;
+    }
+    #history-col {
+      flex-basis: 50em;
+      flex: 1;
+      overflow-y: scroll;
+      padding-top: 5em;
+    }
   }
-  #action-col {
-    flex-basis: 30em;
-    overflow-y: auto;
-    padding: 2em 0;
-  }
-  #history-col {
-    flex-basis: 50em;
-    flex: 1;
-    overflow-y: scroll;
-    padding-top: 5em;
-  }
+
   h3 {
     margin: 0.2em 0 0.4em;
+  }
+  h3:not(:first-child) {
+    padding-top: 1.2em;
   }
   h4 {
     margin: 0em 0 0.2em;
@@ -78,6 +91,7 @@
   }
   .entry textarea {
     width: 100%;
+    resize: vertical;
   }
   .error-msg {
     color: #f33 !important;
@@ -85,30 +99,49 @@
   a {
     color: #ccc;
   }
+
 </style>
 
 <div id="app">
   <div id="action-col">
-    <h1>👨‍💻 da.gd lookup tool</h1>
+    <h1>👨‍💻 da.gd query tool</h1>
 
     <section class="get-attribute">
       <h3>Attribute Lookup</h3>
-      <button data-action="attr" data-path="/ua">User-Agent</button>
-      <button data-action="attr" data-path="/ip">IP Address</button>
-      <button data-action="attr" data-path="/headers">Request Headers</button>
-      <button data-action="attr" data-path="/isp">ISP Name</button>
-    </section>
+      <button data-query="attr" data-path="/ua">User-Agent</button>
+      <button data-query="attr" data-path="/headers">Request Headers</button>
 
-    <section class="get-attribute">
+      <div class="multi-button">
+        <button data-query="attr" data-path="/ip">IP Address</button>
+        <button data-query="attr" data-path="/ip"
+                data-proto="4" class="alt-button">IPv4</button>
+        <button data-query="attr" data-path="/ip"
+                data-proto="6" class="alt-button">IPv6</button>
+      </div>
+
+      <div class="multi-button">
+        <button data-query="attr" data-path="/isp">ISP Name</button>
+        <button data-query="attr" data-path="/isp"
+                data-proto="4" class="alt-button">IPv4</button>
+        <button data-query="attr" data-path="/isp"
+                data-proto="6" class="alt-button">IPv6</button>
+      </div>
+
+
       <h3>Name Queries</h3>
       <input id="input-name" type="text" autofocus required
              placeholder="hostname or IP address" />
-      <button data-action="query" data-path="/w">WHOIS</button>
-      <button data-action="query" data-path="/up">HTTP check</button>
-      <button data-action="query" data-path="/host">Resolve Host</button>
-      <button data-action="query" data-path="/dns">DNS Query</button>
-      <button data-action="query" data-path="/headers">Response Headers</button>
-      <button data-action="query" data-path="/isp">ISP Name</button>
+      <button data-query="name" data-path="/w">WHOIS</button>
+      <button data-query="name" data-path="/host">Resolve Host</button>
+      <button data-query="name" data-path="/dns">DNS Query</button>
+      <button data-query="name" data-path="/isp">ISP Name</button>
+
+
+      <h3>URL Queries</h3>
+      <input id="input-url" type="text" autofocus required
+             placeholder="url, hostname, or IP address" />
+      <button data-query="url" data-path="/up">HTTP check</button>
+      <button data-query="url" data-path="/headers">Response Headers</button>
     </section>
   </div>
 
@@ -163,21 +196,35 @@
   };
 
   const inputName = document.querySelector('#input-name');
+  const inputUrl = document.querySelector('#input-url');
 
   function doAction (action) {
-    var entry = addEntry(action.action);
+    var entry = addEntry(action.query);
 
-    switch (action.action) {
+    switch (action.query) {
       case 'attr':
-        entry.title('attribute: '+action.path);
+        var hostname = 'da.gd';
+        var title = 'attribute query: '+action.path;
+        if (action.proto) {
+          hostname = action.proto + '.' + hostname;
+          title += ` (using IPv${action.proto})`;
+        }
+
+        entry.title(title);
         entry.promise(
-          fetch('https://da.gd'+action.path)
+          fetch('https://'+hostname+action.path)
           .then(x => x.text()));
         break;
 
-      case 'query':
-        const name = inputName.value;
-        entry.title('lookup: '+action.path+'/'+name);
+      case 'name':
+        let name;
+        try {
+          name = cleanName(inputName.value);
+        } catch (err) {
+          return entry.promise(Promise.reject(err));
+        }
+
+        entry.title('name query: '+action.path+'/'+name);
         if (name) {
           entry.promise(
             fetch('https://da.gd'+action.path+'/'+name)
@@ -185,8 +232,22 @@
         } else {
           entry.promise(
             Promise.reject(new Error('Name is required')));
+          inputName.focus();
         }
-        inputName.focus();
+        break;
+
+      case 'url':
+        const url = inputUrl.value;
+        entry.title('url query: '+action.path+'/'+url);
+        if (url) {
+          entry.promise(
+            fetch('https://da.gd'+action.path+'/'+url)
+            .then(x => x.text()));
+        } else {
+          entry.promise(
+            Promise.reject(new Error('URL is required')));
+          inputUrl.focus();
+        }
         break;
 
       default:
@@ -200,11 +261,32 @@
   document.addEventListener("click", event => {
     var element = event.target;
     while (element) {
-      if (element.nodeName === 'BUTTON' && 'action' in element.dataset) {
+      if (element.nodeName === 'BUTTON' && 'query' in element.dataset) {
         return doAction(element.dataset);
       }
       element = element.parentNode;
     }
   }, false);
+
+  function cleanName(input) {
+    // clean up a URL into a name
+    if (input.includes('://')) {
+      let match = input.match(/:\/\/([^:\/]+)/);
+      if (match && confirm(
+`I cleaned that URI you gave me into a hostname.\n
+Input: ${input}
+Cleaned: ${match[1]}\n
+Sound good, boss?`)) {
+        return match[1];
+      }
+    }
+
+    if (input.includes('/') || !(input.match(/[:.]/))) {
+      alert(`That input you gave me doesn't look like a DNS name or IP address. Wanna try again?`);
+      throw new Error(`Couldn't understand ${JSON.stringify(input)} as a name, selfishly refusing to send to dagd`);
+    }
+
+    return input;
+  }
 
 </script>
