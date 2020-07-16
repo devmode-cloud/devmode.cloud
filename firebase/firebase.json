@@ -1,6 +1,12 @@
 {
   "hosting": {
     "public": "public",
+    "rewrites": [
+     {
+        "source": "~*/irc/",
+        "destination": "/irc-moved.html"
+      }
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
