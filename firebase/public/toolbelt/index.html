@@ -1,0 +1,103 @@
+<!doctype html>
+
+<title>toolbelt</title>
+<h1>👨‍💻 devmode.cloud developer toolbelt</h1>
+
+<style type="text/css">
+  body {
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 2em;
+    box-sizing: border-box;
+    min-width: 40em;
+    font-family: monospace;
+  }
+  h1 {
+    margin: 0.3em 1em;
+    color: #999;
+  }
+
+  #tool-list {
+    margin: 4em 0;
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+  }
+  #tool-list li {
+    margin: 1em;
+    flex-basis: 20em;
+  }
+  #tool-list a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+    height: 3em;
+
+    font-size: 1.6em;
+    background-color: rgba(200, 200, 200, 0.5);
+    color: #fff;
+
+    transition: background-color 0.2s linear;
+  }
+  #tool-list a:not(:hover) {
+    text-decoration: none;
+    background-color: rgba(200, 200, 200, 0.3);
+  }
+</style>
+
+<ul id="tool-list"></ul>
+
+<script type="text/javascript">
+  // const toolListP = fetch('/~~export', {
+  //   method: 'POST',
+  //   body: JSON.stringify({
+  //     Op: 'enumerate',
+  //     Path: '/public/web/toolbelt',
+  //     Depth: 1,
+  //   }),
+  // })
+  //   .then(x => x.json())
+  //   .then(x => x.Output.Children)
+  //   .then(x => x
+  //         .filter(x => x.Type === 'File')
+  //         .filter(x => x.Name !== 'index.html')
+  //         .filter(x => x.Name !== 'prettyjson.html')
+  //         .map(x => x.Name));
+  const toolListP = Promise.resolve([
+    'aws-ips.html',
+    'base64.html',
+    'binary.html',
+    'calculator.html',
+    'dagd.html',
+    'irc-colors.html',
+    'jwt.html',
+    'pretty-json.html',
+    'regex-tester.html',
+    'timestamp.html',
+    'urlencode.html',
+  ]);
+
+  const toolList = document.getElementById('tool-list');
+
+  toolListP.then(list => {
+
+    list.forEach(file => {
+      const baseName = file.split('.').slice(0, -1).join('.');
+
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      const span = document.createElement('span');
+      li.appendChild(a);
+      a.appendChild(span);
+      a.setAttribute('href', file);
+      span.innerText = baseName.replace(/-/g, ' ');
+
+      toolList.appendChild(li);
+    });
+  });
+</script>
