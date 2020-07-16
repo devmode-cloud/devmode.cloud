@@ -4,7 +4,7 @@
 <a id="overview"></a><section>
   <h1><a href="#overview">webhooks <span class="gray">@</span> devmode.cloud</a></h1>
   <p>We speak webhook on <strong>Freenode</strong>! Chuck payloads at our endpoints and colorful IRC messages will appear in your channel from <code>skylink</code> :)</p>
-  <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2020, but there is no SLA offered at this time. <u>By adding these webhooks to your project, you agree to these terms.</u></p>
+  <p>All webhook payloads are logged for quality-assurance purposes. Unhandled payloads will be investigated so that future payloads can be handled properly. I intend to support these URLs thru 2022, but there is no SLA offered at this time. <u>By adding these webhooks to your project, you agree to these terms.</u></p>
   <p>Attached URLs are shortened using <a href="https://da.gd" target="_blank">da.gd</a> by default. There's also a shortened version of these hooks based at https://sl.da.gd</p>
 
   <p>Available hooks:</p>
@@ -27,10 +27,16 @@
     <li><code>push</code> for push, force push/revert, merge, and branch creation/deletion</li>
     <li><code>issues</code> for opening, editting, closing/merging, [de]milestoning, and [un]labeling issues</li>
     <li><code>issue_comment</code> to notify of new issue/PR comments, including body, and also mention edits</li>
-    <li><code>pull_request</code> is a lot like <code>issues</code> (plus synchronization, which is hidden by default)</li>
-    <li><code>status</code> for failed build statuses</li>
+    <li><code>pull_request</code> is a lot like <code>issues</code> (plus synchronization, which is hidden by Skylink)</li>
+    <li><code>pull_request_review</code> shows when PRs receive reviews, including the determination made</li>
     <li><code>milestone</code> and <code>label</code> to report on planning updates</li>
+    <li><code>create</code> and <code>delete</code> report git tag management</li>
+    <li><code>gollum</code> talked about <em>wiki</em> edits</li>
+    <li><code>status</code>, <code>deployment</code>, <code>deployment_status</code>, and <code>page_build</code> for CI &amp; CD updates</li>
     <li><code>watch</code> is misleading, it notifies when people <em>star</em> the repo</li>
+    <li><code>member</code> reports when <em>collaborators</em> are added or otherwise changed</li>
+    <li><code>fork</code> calls out every time the repository is forked by someone</li>
+    <li><code>repository</code> just in case that's a thing that happens</li>
     <li><code>ping</code> to notify of new hooks being configured</li>
   </ul>
 
@@ -39,13 +45,11 @@
     <li><code>&amp;<span>longurl</span></code> disables the URL shortener. Doesn't matter what value you pass.</li>
     <li><code>&amp;<span>branch_filter</span>=master,develop</code> <em>only</em> shows push events for branches matching the pattern list.</li>
     <li><code>&amp;<span>branch_ignore</span>=staging.*,trying.*</code> <em>drops</em> push events for branches matching the pattern list.</li>
+    <li><code>&amp;<span>action_filter</span>=created,opened,submitted</code> applies to action-based events and <em>removes</em> events of any other action. Push is unaffected.</li>
+    <li><code>&amp;<span>action_ignore</span>=edited</code> <em>drops</em> any events that have an action matching the pattern list.</li>
     <li><code>&amp;<span>bors</span>=bors[bot]</code> sets a <a href="https://bors.tech/" target="_blank">bors</a> name for extra handling.<ul>
       <li>Use this with <code>branch_ignore</code> for best results!</li>
     </ul></li>
-    <li><code>&amp;<span>verbosity</span>=3</code> adjusts notification volume from 1 to 4, default 2.<ul>
-      <li>1=Minimal, 2=Default, 3=Extra, 4=Everything.</li>
-      <li>If you'd like more details, try level 3. Level 4 doesn't even drop duplicated events.</li>
-    </ul>
   </ul>
 
   <p>Examples of different event types:</p>
