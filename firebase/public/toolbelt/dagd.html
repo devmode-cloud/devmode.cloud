@@ -73,6 +73,8 @@
       flex: 1;
       overflow-y: scroll;
       padding-top: 5em;
+      height: 100vh;
+      box-sizing: border-box;
     }
   }
 
@@ -82,7 +84,11 @@
   h3:not(:first-child) {
     padding-top: 1.2em;
   }
+  a.deeplink {
+    margin-right: 0.4em;
+  }
   h4 {
+    display: inline;
     margin: 0em 0 0.2em;
   }
   .get-attribute {
@@ -117,6 +123,8 @@
                 data-proto="4" class="alt-button">IPv4</button>
         <button data-query="attr" data-path="/ip"
                 data-proto="6" class="alt-button">IPv6</button>
+        <!--button data-query="attr" data-path="/ip"
+                data-proto="wg69" class="alt-button">wg69</button-->
       </div>
 
       <div class="multi-button">
@@ -125,23 +133,25 @@
                 data-proto="4" class="alt-button">IPv4</button>
         <button data-query="attr" data-path="/isp"
                 data-proto="6" class="alt-button">IPv6</button>
+        <!--button data-query="attr" data-path="/isp"
+                data-proto="wg69" class="alt-button">wg69</button-->
       </div>
 
 
       <h3>Name Queries</h3>
       <input id="input-name" type="text" autofocus required
              placeholder="hostname or IP address" />
-      <button data-query="name" data-path="/w">WHOIS</button>
-      <button data-query="name" data-path="/host">Resolve Host</button>
-      <button data-query="name" data-path="/dns">DNS Query</button>
-      <button data-query="name" data-path="/isp">ISP Name</button>
+      <button data-query="name" data-path="/w" data-input="#input-name">WHOIS</button>
+      <button data-query="name" data-path="/host" data-input="#input-name">Resolve Host</button>
+      <button data-query="name" data-path="/dns" data-input="#input-name">DNS Query</button>
+      <button data-query="name" data-path="/isp" data-input="#input-name">ISP Name</button>
 
 
       <h3>URL Queries</h3>
       <input id="input-url" type="text" autofocus required
              placeholder="url, hostname, or IP address" />
-      <button data-query="url" data-path="/up">HTTP check</button>
-      <button data-query="url" data-path="/headers">Response Headers</button>
+      <button data-query="url" data-path="/up" data-input="#input-url">HTTP check</button>
+      <button data-query="url" data-path="/headers" data-input="#input-url">Response Headers</button>
     </section>
   </div>
 
@@ -164,9 +174,13 @@
     output.rows = 1;
     const time = document.createElement('time');
 
+    const headbox = document.createElement('div');
+    headbox.classList.add('entry-head');
+    headbox.appendChild(title);
+
     const box = document.createElement('section');
     box.classList.add('entry');
-    box.appendChild(title);
+    box.appendChild(headbox);
     box.appendChild(progress);
     historyCol.insertBefore(box, historyCol.children[0]);
 
@@ -181,6 +195,13 @@
     }
 
     return {
+      deeplink(path) {
+        const deeplink = document.createElement('a');
+        deeplink.href = 'https://da.gd/ui#' + encodeURI(path);
+        deeplink.innerText = '#';
+        deeplink.classList.add('deeplink');
+        headbox.insertBefore(deeplink, title);
+      },
       title(text) { title.innerText = text; },
       promise(p) {
         p.then(text => {
@@ -203,16 +224,22 @@
 
     switch (action.query) {
       case 'attr':
+        var proto = 'https';
         var hostname = 'da.gd';
         var title = 'attribute query: '+action.path;
-        if (action.proto) {
+        if (action.proto === 'wg69') {
+          proto = 'http';
+          hostname = 'dagd.rick.tun.wg69.net';
+          title += ` (using wg69 VPN)`;
+        } else if (action.proto) {
           hostname = action.proto + '.' + hostname;
           title += ` (using IPv${action.proto})`;
         }
 
+        entry.deeplink(action.path);
         entry.title(title);
         entry.promise(
-          fetch('https://'+hostname+action.path)
+          fetch(proto+'://'+hostname+action.path)
           .then(x => x.text()));
         break;
 
@@ -224,6 +251,7 @@
           return entry.promise(Promise.reject(err));
         }
 
+        entry.deeplink(action.path+'/'+name);
         entry.title('name query: '+action.path+'/'+name);
         if (name) {
           entry.promise(
@@ -238,6 +266,7 @@
 
       case 'url':
         const url = inputUrl.value;
+        entry.deeplink(action.path+'/'+url);
         entry.title('url query: '+action.path+'/'+url);
         if (url) {
           entry.promise(
@@ -287,6 +316,33 @@ Sound good, boss?`)) {
     }
 
     return input;
+  }
+
+  function doActionForUrl (url) {
+    const [_, path, ...arg] = url.split('/');
+    if (!path || !path.length === 0) return;
+
+    let selector = `button[data-query][data-path="/${path}"]`;
+    if (arg.length > 0) selector += `[data-input]`;
+
+    const button = document.querySelector(selector);
+    if (!button) return;
+
+    if (button.dataset.input) {
+      const inputBox = document.querySelector(button.dataset.input);
+      if (!inputBox) return;
+      inputBox.value = arg.join('/');
+      setTimeout(function () {
+        inputBox.focus();
+      }, 1);
+    }
+
+    button.click();
+  }
+
+  const hash = window.location.hash;
+  if (hash && hash.length > 1) {
+    doActionForUrl(hash.slice(1));
   }
 
 </script>

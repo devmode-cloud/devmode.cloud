@@ -1,0 +1,406 @@
+<!doctype html>
+
+<meta charset="utf-8" />
+<title>AWS IPs</title>
+<meta name="viewport" content="width=device-width">
+<h1>👨‍💻 AWS IP Resolver</h1>
+
+<style type="text/css">
+  body {
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    padding: 2em 2em 10em;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 60em;
+    font-family: monospace;
+  }
+  h1 {
+    margin: 0.3em 1em;
+    color: #999;
+  }
+  form {
+    display: grid;
+    grid-template-columns: 1fr 8em;
+    grid-gap: 1em;
+    grid-auto-rows: 3em;
+    margin: 1em;
+  }
+  input, textarea {
+    box-sizing: border-box;
+    background-color: #222;
+    color: #fff;
+    font-size: 1em;
+    padding: 0.3em 0.5em;
+    border: 1px solid #999;
+    overflow-y: hidden;
+  }
+  input[readonly], textarea[readonly] {
+    border-width: 0;
+    background-color: #555;
+    font-family: inherit;
+    color: #fff;
+  }
+  button {
+    font-size: 1.2em;
+    border: 1px solid #999;
+    background-color: #444;
+    font-family: inherit;
+    color: #fff;
+  }
+  section {
+    font-size: 1.3em;
+    margin: 0.8em;
+    padding: 1em;
+    background-color: rgba(200, 200, 200, 0.3);
+  }
+  .entry-head {
+    padding: 0 0 0.3em;
+  }
+  @media (max-width: 800px) {
+    body {
+      padding: 1em 0 10em;
+    }
+    section {
+      margin: 0.8em 0;
+    }
+    section.entry {
+      padding: 0;
+      text-align: center;
+    }
+    .entry-head {
+      padding: 0.5em;
+    }
+    progress {
+      margin-bottom: 1em;
+    }
+  }
+  h3 {
+    margin: 0.2em 0 0.4em;
+  }
+  h3:not(:first-child) {
+    padding-top: 1.2em;
+  }
+  a.deeplink {
+    margin-right: 0.4em;
+  }
+  h4 {
+    display: inline;
+    margin: 0em 0 0.2em;
+  }
+  section.entry textarea {
+    width: 100%;
+    resize: vertical;
+    vertical-align: bottom;
+  }
+  .error-msg {
+    color: #f33 !important;
+  }
+  a {
+    color: #ccc;
+  }
+  section.intro {
+    padding: 0.5em 1em;
+  }
+  section.intro ul {
+    padding: 0 0.5em;
+    list-style: none;
+  }
+  section.footer {
+    background-color: rgba(200, 200, 200, 0.15);
+    color: rgba(200, 200, 200, 0.5);
+  }
+  section.footer a {
+    color: rgba(200, 200, 200, 0.8);
+  }
+</style>
+
+<form id="lookup">
+  <input type="text" name="ipaddr" placeholder="Paste an IP address, hostname, or URL" required autofocus>
+  <button type="submit">Lookup</button>
+</form>
+
+<div id="history-col">
+  <section class="intro">
+    <ul>
+      <li><strong>example lookups</strong></li>
+      <li><a href="#amazon.com">amazon.com</a> (the online store)</li>
+      <li><a href="#console.aws.amazon.com">console.aws.amazon.com</a></li>
+      <li><a href="#status.aws.amazon.com">status.aws.amazon.com</a></li>
+      <li><a href="#slack.com">slack.com</a> (CloudFront)</li>
+      <li><a href="#heroku.com">heroku.com</a></li>
+      <li><a href="#github.scopely.io">github.scopely.io</a> (dual region!)</li>
+      <li><a href="#collector.scopely.io">collector.scopely.io</a> (IPv6)</li>
+      <li><a href="#bethesda.net">bethesda.net</a> (CloudFront)</li>
+      <li><a href="#cloudycluster.com">cloudycluster.com</a> (S3)</li>
+      <li><a href="#cloudping.co">cloudping.co</a></li>
+      <li><a href="#pepedev.com">pepedev.com</a></li>
+      <li><a href="#fortunecookie-vpn.scopely.io">fortunecookie-vpn.scopely.io</a></li>
+      <li><a href="#status.github.com">status.github.com</a></li>
+      <li><a href="#en.wikipedia.org">en.wikipedia.org</a> (non-AWS)</li>
+      <li><a href="#8.8.8.8">Cloudflare DNS</a> (non-AWS)</li>
+    </ul>
+    <ol>
+      <li>Enter an Internet IPv4, hostname, or URL</li>
+      <li>
+        Discover which <strong>AWS Region</strong>
+        and <strong>AWS Service</strong>
+        keeps it running
+      </li>
+      <li>
+        For non-AWS addresses, only the
+        <abbr title="The IP address block's WHOIS data is grepped searching for an ISP name. Not a precise art.">ISP (?)</abbr>
+        is shown
+      </li>
+    </ol>
+  </section>
+  <section class="footer">
+    <div>
+      toolbelt tools by
+      <a target="_new" href="https://github.com/danopia">@danopia</a>
+    </div>
+    <div>
+      <a target="dagd" href="https://da.gd/help#host">DNS</a>
+      and
+      <a target="dagd" href="https://da.gd/help#isp">ISP</a>
+      resolution by
+      <a target="dagd" href="https://da.gd">da.gd</a>
+    </div>
+  </section>
+</div>
+
+<script type="text/javascript">
+
+  const historyCol = document.querySelector('#history-col');
+  function addEntry () {
+
+    const title = document.createElement('h4');
+    const progress = document.createElement('progress');
+    const output = document.createElement('textarea');
+    output.readOnly = true;
+    output.rows = 1;
+    const time = document.createElement('time');
+
+    const headbox = document.createElement('div');
+    headbox.classList.add('entry-head');
+    headbox.appendChild(title);
+
+    const box = document.createElement('section');
+    box.classList.add('entry');
+    box.appendChild(headbox);
+    box.appendChild(progress);
+    historyCol.insertBefore(box, historyCol.children[0]);
+
+    const finalizeBox = () => {
+      box.removeChild(progress);
+
+      box.appendChild(output);
+      box.appendChild(time);
+      setTimeout(() => {
+        output.style.height = output.scrollHeight+'px';
+      }, 0);
+    }
+
+    return {
+      deeplink(path) {
+        const deeplink = document.createElement('a');
+        deeplink.href = '#' + encodeURI(path);
+        deeplink.innerText = '#';
+        deeplink.classList.add('deeplink');
+        headbox.insertBefore(deeplink, title);
+      },
+      title(text) { title.innerText = text; },
+      promise(p) {
+        return p.then(text => {
+          output.value = text.trim();
+          finalizeBox();
+        }, err => {
+          output.classList.add('error-msg');
+          output.value = err.message || JSON.stringify(err, null, 2);
+          finalizeBox();
+        });
+      },
+    };
+  };
+
+  function FirstThenPlusN(list, firstN) {
+    if (list.length <= firstN)
+      return list.join(', ');
+    return `${list.slice(0, firstN).join(', ')} (+ ${list.length-firstN})`;
+  }
+
+  function ParseInput(rawInput) {
+    const v4Match = rawInput.match(/((?:\d{1,3}\.){3}\d{1,3})(\/|:|$)/);
+    const dnsMatch = rawInput.match(/([a-z0-9.-]+\.[a-z][a-z0-9-]+)(\/|:|$)/i);
+    if (v4Match) {
+      return {
+        text: v4Match[1].toLowerCase(),
+        type: 'ipv4',
+      };
+    } else if (dnsMatch) {
+      return {
+        text: dnsMatch[1].toLowerCase(),
+        type: 'dns',
+      };
+    } else {
+      throw new Error(`Couldn't parse input: ${rawInput}`);
+    }
+  }
+
+  function IPv4ToInt(ip) {
+    return ip
+      .split('.')
+      .reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+  }
+  class PrefixManager {
+    constructor(data) {
+      const [Y,M,D,h,m,s] = data.createDate.split('-');
+      this.createDate = Date.parse(`${Y}-${M}-${D}T${h}:${m}:${s}Z`);
+      this.syncToken = data.syncToken;
+      this.v4Prefixes = data.prefixes;
+      this.v6Prefixes = data.ipv6_prefixes;
+    }
+    v4Matches(ip) {
+      const ipAsInt = IPv4ToInt(ip);
+      const matches = this.v4Prefixes.filter(alloc => {
+        const [range, bits = 32] = alloc.ip_prefix.split('/');
+        const mask = ~(2 ** (32 - bits) - 1);
+        return (ipAsInt & mask) === (IPv4ToInt(range) & mask);
+      });
+      return matches;
+    }
+  }
+
+  const managerPromise = (async function () {
+    const resp = await fetch('https://ip-ranges.amazonaws.com/ip-ranges.json')
+    const json = await resp.json();
+    return new PrefixManager(json);
+  })();
+
+  const existingQueries = new Map;
+  function queryInput(input, andSetHash=false) {
+    if (existingQueries.has(input.text))
+      return false;
+
+    const entry = addEntry();
+    entry.title(input.text);
+    entry.deeplink(input.text);
+    existingQueries.set(input.text, entry);
+
+    if (andSetHash)
+      window.location.hash = `#${encodeURI(input.text)}`;
+
+    return entry.promise(managerPromise.then(async manager => {
+      let header = '';
+      let primaryAddress;
+      let ranges = new Set;
+
+      switch (input.type) {
+        case 'ipv4':
+          primaryAddress = input.text;
+          manager.v4Matches(input.text)
+            .forEach(x => ranges.add(x));
+          break;
+
+        case 'dns':
+          const dagdResp = await fetch(`https://da.gd/host/${encodeURI(input.text)}`);
+          const dagdText = await dagdResp.text();
+          if (dagdText.match(/[^0-9a-f:., \n]/i))
+            throw new Error(dagdText.trim());
+
+          const addresses = dagdText.trim().split(', ');
+          const v4Addresses = addresses.filter(x => x.includes('.'));
+          const v6Addresses = addresses.filter(x => x.includes(':'));
+          primaryAddress = v4Addresses[0] || v6Addresses[0];
+
+          if (v4Addresses.length > 0)
+            header += `IPv4: ${FirstThenPlusN(v4Addresses, 3)}\n`;
+          if (v6Addresses.length > 0)
+            header += `IPv6: ${FirstThenPlusN(v6Addresses, 1)}\n`;
+
+          for (const v4Addr of v4Addresses) {
+            manager.v4Matches(v4Addr)
+              .forEach(x => ranges.add(x));
+          }
+          break;
+
+        default:
+          throw new Error(`Input of invalid type: ${input.type}`);
+      }
+
+      if (ranges.size === 0 && primaryAddress) {
+        const ispResp = await fetch(`https://da.gd/isp/${primaryAddress}`);
+        const ispText = await ispResp.text();
+        header += `Not AWS: ${ispText.trim()}`;
+      }
+
+      const rangeMap = new Map;
+      for (const range of ranges) {
+        const key = [
+          range.ip_prefix,
+          range.region,
+        ].join('#');
+        if (!rangeMap.has(key)) rangeMap.set(key, new Array);
+        rangeMap.get(key).push(range);
+      }
+
+      const rangeMap2 = new Map;
+      for (const ranges of rangeMap.values()) {
+        const key = [
+          ranges[0].region,
+          ...ranges.map(x => x.service).sort(),
+        ].join('#');
+        if (!rangeMap2.has(key)) rangeMap2.set(key, new Array);
+        const list = rangeMap2.get(key)
+        for (const range of ranges) {
+          list.push(range);
+        }
+      }
+
+       const results = Array
+        .from(rangeMap2.values())
+        .map(matches => {
+          const prefixes = Array.from(new Set(matches.map(x => x.ip_prefix)));
+          const services = Array.from(new Set(matches.map(x => x.service)));
+          return [
+            `Prefix${prefixes.length>1?'es':''}: ${prefixes.join(', ')}`,
+            `Region: ${matches[0].region}`,
+            `Service: ${services.join(' ')}`,
+          ].join('\n');
+        });
+
+      return header + '\n' + results.join('\n\n');
+    }));
+  }
+
+  const form = document.querySelector('form');
+  form.addEventListener('submit', evt => {
+    evt.preventDefault();
+    const {ipaddr} = evt.target;
+    const rawInput = ipaddr.value;
+    queryInput(ParseInput(rawInput), true)
+      .then(() => ipaddr.value = '');
+  });
+
+  const inputBox = form.ipaddr;
+  inputBox.addEventListener('paste', evt => {
+    try {
+      const pasteData = evt.clipboardData.getData('text');
+      queryInput(ParseInput(pasteData), true)
+        .then(() => inputBox.value = '');
+    } catch (err) {
+      console.log('not acting on paste.', err);
+    }
+  });
+
+  function readHash() {
+    const hash = window.location.hash;
+    if (hash && hash.length > 1) {
+      queryInput(ParseInput(decodeURI(hash.slice(1))));
+    }
+  }
+  window.onhashchange = readHash;
+  readHash();
+
+</script>
