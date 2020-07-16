@@ -1,0 +1,47 @@
+<div id="grid"></div>
+
+<script>
+  const maxX = 5;
+  const maxY = 4;
+  const grid = document.querySelector('#grid');
+  for   (let x = -maxX, left = 1; x <= maxX; x++, left++) {
+    for (let y = -maxY, top  = 1; y <= maxY; y++, top++ ) {
+
+      const anchor = document.createElement('a');
+      anchor.style.gridColumn = left;
+      anchor.style.gridRow = top;
+      anchor.href = `https://ascii.town/explore.html#x=${x}&y=${y}`;
+      anchor.target = '_blank';
+
+      const img = document.createElement('img');
+      img.src = `https://ascii.town/tile.png?x=${x}&y=${y}`;
+      anchor.appendChild(img);
+
+      grid.appendChild(anchor);
+    }
+  }
+</script>
+
+<style>
+  body {
+    margin: 0;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #grid {
+    display: grid;
+  }
+  #grid img, #grid a {
+    /* originals are 640x400 */
+    width: 128px;
+    height: 80px;
+    display: block;
+  }
+  #grid a:hover {
+    border: 2px solid white;
+    margin: -2px;
+    z-index: 5;
+  }
+</style>
