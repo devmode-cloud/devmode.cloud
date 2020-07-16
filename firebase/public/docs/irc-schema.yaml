@@ -1,0 +1,168 @@
+types:
+
+# Abstract representation a single history/UI window
+# Can contain large amounts of time-based ordered items.
+# Add some metadata to this to build your own contexts.
+- name: context
+  params:
+  - name: entry-types
+  fields:
+  - name: latest-activity
+    optional: yes
+    type:
+      path: //core/string
+  - name: latest-seen
+    optional: yes
+    type:
+      path: //core/string
+  - name: log
+    type:
+      path: //core/partitioned-log
+      partitions:
+      - field: timestamp
+        kind: date
+        format: YYYY-MM-DD
+      value-types:
+        path: params/entry-types
+
+
+#########################################
+# Context for a regular IRC channel on the server
+- name: channel
+  fields:
+
+  - name: name
+    type:
+      path: //core/string
+
+  - name: is-joined
+    type:
+      path: //core/bit
+
+  # Anonymous field embedding a context of packets
+  - type:
+      path: /context
+      entry-types:
+      - path: /packet
+      - path: /packet-flood
+      - path: //core/log-discontinuity
+
+  # Collection of records placing users in the channel
+  - name: membership
+    type:
+      path: //core/dictionary
+      key-field: nick
+      value-type:
+        fields:
+        - name: nick
+          type:
+            path: //core/string
+        # What is the usecase?
+        #- name: user
+        #  type:
+        #    path: /user
+        - name: since
+          type:
+            path: //core/timestamp
+        # Updated with modes - the most-powerful prefix char for the user
+        - name: prefix
+          type:
+            path: //core/string
+        - name: modes
+          type:
+            path: //core/string
+
+  # Map of modechar => optional param
+  - name: modes
+    type:
+      path: //core/map
+      key-type:
+        path: //core/string
+      value-type:
+        path: //core/string
+
+  # The most recent topic as a subdocument.
+  # BoxedVariable keeps an ordered sequence of historical values.
+  # Basically means this will change but we still sometimes care about recent old values.
+  # Box history can be trimmed as a maintanence task
+  - name: topic
+    type:
+      path: //core/boxed-variable
+      value-type:
+        fields:
+        - name: text
+          type:
+            path: //core/string
+        - name: set-at
+          type:
+            path: //core/timestamp
+        - name: set-by
+          type:
+            path: //core/string
+
+#########################################
+# Journal for one IRC connection profile
+- name: network
+  fields:
+
+  # The channels a user has a record of
+  - name: channels
+    type:
+      path: //core/dictionary
+      key-field: name
+      value-type:
+        path: /channel
+      normalizer-func: normalize-name
+
+  # Same but w/ other users
+  - name: queries
+    type:
+      path: //core/dictionary
+      key-field: name
+      value-type:
+        path: /channel
+      normalizer-func: normalize-name
+
+  # Current real nick incl. history
+  - name: my-nickname
+    type:
+      path: //core/boxed-variable
+      value-type:
+        path: //core/string
+
+  #
+  - name: mentions
+    type:
+      path: /context
+      entry-types:
+      - path: /packet
+  - name: server
+    type:
+      fields:
+      - name: hostname
+        type:
+          path: //core/string
+      - name: software
+        type:
+          path: //core/string
+      - name: supported
+        type:
+          path: //core/map
+      - path: /context
+        entry-types:
+        - path: /packet
+        - path: /packet-flood
+        - path: //core/log-discontinuity
+  - name: channels
+    type:
+      path: //core/string
+  - name: channels
+    type:
+      path: //core/string
+  helpers:
+  - name: normalize-name
+    routine: map-name-casing
+    input:
+      path: //core/string
+    output:
+      path: //core/string

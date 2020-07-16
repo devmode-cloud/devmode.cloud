@@ -1,0 +1,46 @@
+types:
+
+- name: schema
+  fields:
+  - name: types
+    type:
+      path: //core/map
+      value-type:
+        path: /type
+      key-field: name
+
+- name: type
+  fields:
+  - name: name
+    immutable: yes
+    type:
+      path: //core/string
+  - name: path
+    optional: yes
+    type:
+      path: //core/string
+  - name: fields
+    optional: yes
+    type:
+      path: //core/map
+      value-type:
+        path: /field
+      key-field: name
+
+- name: field
+  fields:
+  - name: name
+    immutable: yes
+    type:
+      path: //core/string
+  - name: optional
+    optional: yes
+    type:
+      path: //core/bit
+  - name: immutable
+    optional: yes
+    type:
+      path: //core/bit
+  - name: type
+    type:
+      path: /type
