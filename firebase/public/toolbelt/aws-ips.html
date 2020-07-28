@@ -129,6 +129,7 @@
       <li><a href="#console.aws.amazon.com">console.aws.amazon.com</a></li>
       <li><a href="#status.aws.amazon.com">status.aws.amazon.com</a></li>
       <li><a href="#slack.com">slack.com</a> (CloudFront)</li>
+      <li><a href="#api.spotify.com">api.spotify.com</a> (Google Cloud)</li>
       <li><a href="#heroku.com">heroku.com</a></li>
       <li><a href="#github.scopely.io">github.scopely.io</a> (dual region!)</li>
       <li><a href="#collector.scopely.io">collector.scopely.io</a> (IPv6)</li>
@@ -254,12 +255,23 @@
       .reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
   }
   class PrefixManager {
-    constructor(data) {
-      const [Y,M,D,h,m,s] = data.createDate.split('-');
-      this.createDate = Date.parse(`${Y}-${M}-${D}T${h}:${m}:${s}Z`);
+    constructor(data, source) {
+      this.prefixSource = source;
       this.syncToken = data.syncToken;
-      this.v4Prefixes = data.prefixes;
-      this.v6Prefixes = data.ipv6_prefixes;
+      if (source === 'aws') {
+        const [Y,M,D,h,m,s] = data.createDate.split('-');
+        this.createDate = Date.parse(`${Y}-${M}-${D}T${h}:${m}:${s}Z`);
+
+        this.v4Prefixes = data.prefixes;
+        this.v6Prefixes = data.ipv6_prefixes;
+      } else if (source === 'gcloud') {
+        this.createDate = Date.parse(data.creationTime);
+
+        this.v4Prefixes = data.prefixes.filter(x => 'ipv4Prefix' in x)
+          .map(x => ({ip_prefix: x.ipv4Prefix, region: x.scope, service: x.service}));
+        this.v6Prefixes = data.prefixes.filter(x => 'ipv6Prefix' in x)
+          .map(x => ({ip_prefix: x.ipv6Prefix, region: x.scope, service: x.service}));
+      }
     }
     v4Matches(ip) {
       const ipAsInt = IPv4ToInt(ip);
@@ -272,16 +284,26 @@
     }
   }
 
-  const managerPromise = (async function () {
+  const awsPromise = (async function () {
     const resp = await fetch('https://ip-ranges.amazonaws.com/ip-ranges.json')
     const json = await resp.json();
-    return new PrefixManager(json);
+    return new PrefixManager(json, 'aws');
   })();
+  const gcloudPromise = (async function () {
+    // const resp = await fetch('https://www.gstatic.com/ipranges/cloud.json')
+    const resp = await fetch('gcloud.json')
+    const json = await resp.json();
+    return new PrefixManager(json, 'gcloud');
+  })();
+  const managersPromise = Promise.all([
+    awsPromise,
+    gcloudPromise,
+  ])
 
   const existingQueries = new Map;
   function queryInput(input, andSetHash=false) {
     if (existingQueries.has(input.text))
-      return false;
+      return Promise.resolve();
 
     const entry = addEntry();
     entry.title(input.text);
@@ -291,7 +313,7 @@
     if (andSetHash)
       window.location.hash = `#${encodeURI(input.text)}`;
 
-    return entry.promise(managerPromise.then(async manager => {
+    return entry.promise(managersPromise.then(async managers => {
       let header = '';
       let primaryAddress;
       let ranges = new Set;
@@ -299,8 +321,11 @@
       switch (input.type) {
         case 'ipv4':
           primaryAddress = input.text;
-          manager.v4Matches(input.text)
-            .forEach(x => ranges.add(x));
+          for (const manager of managers) {
+            console.log(managers)
+            manager.v4Matches(input.text)
+              .forEach(x => ranges.add(x));
+          }
           break;
 
         case 'dns':
@@ -320,8 +345,10 @@
             header += `IPv6: ${FirstThenPlusN(v6Addresses, 1)}\n`;
 
           for (const v4Addr of v4Addresses) {
-            manager.v4Matches(v4Addr)
-              .forEach(x => ranges.add(x));
+            for (const manager of managers) {
+              manager.v4Matches(v4Addr)
+                .forEach(x => ranges.add(x));
+            }
           }
           break;
 
