@@ -10,17 +10,23 @@
   <p>Available hooks:</p>
   <ul>
     <li><a href="#hook-github">GitHub</a>, most types of events</li>
+    <li><a href="#hook-gitlab">GitLab</a>, common events (WIP)</li>
     <li><a href="#hook-travisci">Travis-CI</a>, build results</li>
     <li><a href="#the-future">got more?</a></li>
   </ul>
+
+  <p>
+    <strong>Note</strong>: For the time being, any messages received in rapid succession (within a second or two) can fall out of order.
+    This is a known case and work is being done to switch to a more strictly-ordered message processor.
+  </p>
 </section>
 
 <a id="hook-github"></a><section>
   <h2><a href="#hook-github"><span class="gray">hook:</span> github</a></h2>
   <p>Add this URL under Settings -> Webhooks:</p>
-  <code>https://ingest.devmode.cloud/hooks/github?channel=#yourchannel</code>
+  <code>https://ingest.devmode.cloud/hooks/github?channel=%23yourchannel</code>
   <p>There's also a shorter version hosted on <a href="https://da.gd" target="_blank">a friend's server</a>, like so:</p>
-  <code>https://sl.da.gd/github?channel=#yourchannel</code>
+  <code>https://sl.da.gd/github?channel=%23yourchannel</code>
   <p>You should immediately see a confirmation in your channel. This hook is faster, denser, and richer than GitHub's own IRC integration. Send just <code>push</code> events, or opt to get more activity into your channel.</p>
   <p>Implemented event types:</p>
   <ul>
@@ -83,6 +89,31 @@
 
   <p>The current version of this hook is maintained in <a href="https://gist.github.com/danopia/5bf79f4eb6f31857c1c95a96f313665b">a public gist</a>.</p>
   <p>If you have more events to handle, let me know: <code>#stardust</code> on freenode</p>
+</section>
+
+<a id="hook-gitlab"></a><section>
+  <h2><a href="#hook-gitlab"><span class="gray">hook:</span> gitlab</a></h2>
+  <p>Add this URL under Settings -> Webhooks:</p>
+  <code>https://ingest.devmode.cloud/hooks/gitlab?channel=%23yourchannel</code>
+
+  <p>GitLab doesn't send a lot of events. So far we report pushes, some MR/Issue actions, commenting, and wiki changes:</p>
+  <div class="examples">
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">backend</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> opened MR </span><span style="font-weight: bold;">!2</span><span> from </span><span style="color: rgb(156, 0, 156);">some-feature-branch</span><span> into </span><span style="color: rgb(156, 0, 156);">master</span><span>: Update README.md </span><span style="text-decoration: underline; color: rgb(70, 130, 180);"><a href="https://da.gd/pj9GXH" target="_blank" class="content-link" style="text-decoration: underline; color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/pj9GXH</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">backend</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> pushed to </span><span style="color: rgb(156, 0, 156);">some-feature-branch</span><span>: </span><span style="color: rgb(127, 127, 127);">6f3a16c</span><span>: Update README.md, views/index.pug files </span><span style="text-decoration: underline; color: rgb(70, 130, 180);"><a href="https://da.gd/Wgelw" target="_blank" class="content-link" style="text-decoration: underline; color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/Wgelw</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">backend</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> commented in a discussion on issue </span><span style="font-weight: bold;">#1</span><span>: hello world </span><span style="text-decoration: underline; color: rgb(70, 130, 180);"><a href="https://da.gd/nHCfGF" target="_blank" class="content-link" style="text-decoration: underline; color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/nHCfGF</span></a></span></div>
+    <div class="message "><span>[</span><span style="color: rgb(255, 0, 255);">backend</span><span>] </span><span style="color: rgb(210, 210, 210);">danopia</span><span> changed the wiki: update </span><span style="color: rgb(156, 0, 156);">home</span><span> </span><span style="text-decoration: underline; color: rgb(70, 130, 180);"><a href="https://da.gd/64gX" target="_blank" class="content-link" style="text-decoration: underline; color: rgb(70, 130, 180);"><span class="origin">https://da.gd</span><span class="path">/64gX</span></a></span></div>
+  </div>
+
+  <p>Similar to GitHub, there are several extra parameters that can be added to the URL. Passing a single option more than once is not supported, you must use commas for lists.</p>
+  <ul>
+    <li><code>&amp;<span>longurl</span></code> disables the URL shortener. Doesn't matter what value you pass.</li>
+    <li><code>&amp;<span>branch_filter</span>=master,develop</code> <em>only</em> shows push events for branches matching the pattern list.</li>
+    <li><code>&amp;<span>branch_ignore</span>=dependabot/*</code> <em>drops</em> push events for branches matching the pattern list.</li>
+    <li><code>&amp;<span>action_filter</span>=create,open,merge</code> applies to action-based events and <em>removes</em> events of any other action. Push is unaffected.</li>
+    <li><code>&amp;<span>action_ignore</span>=edited</code> <em>drops</em> any events that have an action matching the pattern list.</li>
+  </ul>
+
+  <p>This integration is still in progress, feel free to reach out on IRC if there's any tweaks that need to be made.</p>
 </section>
 
 <a id="hook-travisci"></a><section>
