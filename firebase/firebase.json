@@ -1,17 +1,20 @@
 {
   "hosting": {
-    "public": "public",
-    "rewrites": [ {
+    "public": "public-linked",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [{
+      "source": "/~~export",
+      "function": "skylinkOp"
+    }, {
       "source": "~*/irc",
       "destination": "/irc-moved.html"
     }, {
       "source": "~*/irc/",
       "destination": "/irc-moved.html"
-    } ],
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+    }]
   }
 }
