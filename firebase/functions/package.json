@@ -20,7 +20,7 @@
     "@dustjs/backend-firebase": "^0.2.2",
     "@dustjs/skylink": "^0.2.4",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "firebase-admin": "^8.13.0",
+    "firebase-admin": "^9.4.1",
     "firebase-functions": "^3.11.0",
     "module-alias": "^2.2.2"
   },
