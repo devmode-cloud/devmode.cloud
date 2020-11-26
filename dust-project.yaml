@@ -3,17 +3,8 @@ type: installation
 apps:
 - id: editor
   standard: utils/editor
-  # package: @dustjs/standard-apps
-  # source: utils/editor
-
-# - id: car-shop
-#   source: apps/car-shop
-# - id: nav
-#   source: apps/nav
-# - id: contacts
-#   source: apps/contacts
-# - id: inventory
-#   source: apps/inventory
+- id: blog
+  standard: publishing/blog-manager
 
 # - id: irc
 #   source: apps/irc
@@ -79,7 +70,8 @@ hosted_libraries:
   - theme/tomorrow-night-bright\.css
   - mode/meta\.js
   - mode/(htmlmixed|javascript|css)/[^/.]+\.js
-  - mode/(xml|yaml|vue|go|lua)/[^/.]+\.js
+  - mode/(xml|yaml|vue|go|lua|markdown)/[^/.]+\.js
+  - addon/mode/overlay\.js
 
 
 # - npm_module: systemjs
